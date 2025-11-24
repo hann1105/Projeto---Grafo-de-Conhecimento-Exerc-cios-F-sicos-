@@ -4,57 +4,57 @@ import matplotlib.pyplot as plt
 
 
 #Base de conhecimento - Aluno, Objetivo, Exercício, Grupo Muscular, Máquina
-
+#Data frame tipo uma planilha do excel mas no python
 base = pd.DataFrame({
     'head': [
         # Alunos → Objetivo
-        'Paola', 'Paola', 'Lucas',
+        'Paola', 'Lucas',
 
         # Alunos → Exercícios (treino)
         'Paola', 'Lucas',
 
         # Exercício → Músculo primário
-        'Agachamento', 'Rosca 21', 'Tríceps Testa',
+        'Agachamento', 'Rosca 21', 'Tríceps Testa', 'Elevação Pélvica', 'Puxada Alta', 'Leg 45°',
 
         # Exercício → Músculo secundário
-        'Agachamento', 'Rosca 21', 'Tríceps Testa',
+        'Agachamento', 'Rosca 21', 'Tríceps Testa', 'Leg 45°', 'Leg 45°',
 
         # Exercício → Máquina
-        'Tríceps Testa'
+        'Tríceps Testa', 'Elevação Pélvica', 'Leg 45°'
     ],
 
     'relacao': [
         # Aluno → Objetivo
-        'tem objetivo', 'tem objetivo', 'tem objetivo',
+        'tem objetivo', 'tem objetivo',
 
         # Aluno → Treina exercício
         'treina', 'treina',
 
         # Exercício → trabalha músculo primário
-        'trabalha', 'trabalha', 'trabalha',
+        'trabalha', 'trabalha', 'trabalha', 'trabalha', 'trabalha', 'trabalha',
 
         # Exercício → ativa músculo secundário
-        'ativa', 'ativa', 'ativa',
+        'ativa', 'ativa', 'ativa','ativa','ativa',
 
         # Exercício → usa máquina
-        'usa máquina'
+        'usa máquina', 'usa máquina', 'usa máquina'
     ],
 
     'tail': [
         # Alunos → Objetivo
-        'Hipertrofia', 'Emagrecimento', 'Hipertrofia',
+        'Emagrecimento', 'Hipertrofia',
 
         # Aluno → Exercício
         'Agachamento', 'Rosca 21',
 
         # Exercício → músculo primário
-        'Quadríceps', 'Bíceps', 'Tríceps',
+        'Quadríceps', 'Bíceps', 'Tríceps', 'Glúteo', 'Costas', 'Quadríceps',
 
         # Exercício → músculo secundário
-        'Glúteo', 'Antebraço', 'Ombros',
+        'Glúteo', 'Antebraço', 'Ombros', 'Glúteo','Posterior de coxa',
 
         # Exercício → máquina
-        'banco e halteres'
+        'banco e halteres', 'Aparelho de elevação', 'Leg Press'
     ]
 })
 
@@ -84,22 +84,25 @@ class GrafoDeConhecimento:
         else:
             print("Nó não encontrado ou não existe, tente novamente")
 
-    def adicionar_relacionamento(self, head,relation,tail):
+    def adicionar_relacionamento(self, head, relation, tail, atualizar_base=True):
         if head not in self.grafo:
             self.adicionar_no(head)
-        
+
         if tail not in self.grafo:
             self.adicionar_no(tail)
-        
-        self.grafo[head].append((relation,tail))
-        print("Relacionamento adicionado com sucesso ao grafo!")
-        global base
-        nova_linha = pd.DataFrame({
-            'head': [head],
-            'relacao': [relation],
-            'tail': [tail]
-        })
-        base = pd.concat([base, nova_linha], ignore_index=True)
+
+        self.grafo[head].append((relation, tail))
+        print("Relacionamento adicionado ao grafo!")
+
+        # Atualiza a base somente se for inserido pelo usuário
+        if atualizar_base:
+            global base
+            nova_linha = pd.DataFrame({
+                'head': [head],
+                'relacao': [relation],
+                'tail': [tail]
+            })
+            base = pd.concat([base, nova_linha], ignore_index=True)
 
     def remover_relacionamento(self, head, relation, tail):
         if head in self.grafo:
@@ -117,7 +120,8 @@ class GrafoDeConhecimento:
 
     def consultar_relacionamentos_de(self, no):
         if no in self.grafo:
-            return self.grafo[no]
+            print(self.grafo[no])
+            return 
         else:
             print(f"Nó '{no}' não existe.")
             return []
@@ -184,7 +188,7 @@ class GrafoDeConhecimento:
             y -= 3      # próxima camada mais abaixo
 
         # ============================================
-        #      DESENHO DO GRAFO BONITO E ORGANIZADO
+        #      DESENHO DO GRAFO 
         # ============================================
         plt.figure(figsize=(14, 10))
 
@@ -212,6 +216,38 @@ class GrafoDeConhecimento:
         plt.tight_layout()
         plt.show()
 
+    def exercicios_para_musculo(self, musculo):
+        musculo = musculo.lower()
+        resultados = []
+
+        for head, relacao, tail in self.listar_relacionamentos():
+            if tail.lower() == musculo and relacao in ["trabalha", "ativa"]:
+                resultados.append(f"{head} → {relacao} → {tail}")
+
+        if not resultados:
+            return ["Nenhum exercício encontrado para este músculo."]
+        
+        return resultados
+
+
+    def mostrar_grafo_musculo(self, musculo):
+
+        G1 = nx.DiGraph()
+
+        # Adicionar apenas relações referentes ao músculo
+        for head, relacao, tail in self.listar_relacionamentos():
+            if tail.lower() == musculo.lower() and relacao in ["trabalha", "ativa"]:
+                G1.add_edge(head, tail, label=relacao)
+
+        pos = nx.spring_layout(G1, seed=42)
+        labels = nx.get_edge_attributes(G1, 'label')
+
+        plt.figure(figsize=(10, 8))
+        nx.draw(G1, pos, with_labels=True, node_size=2000, font_size=12, node_color='lightgreen')
+        nx.draw_networkx_edge_labels(G1, pos, edge_labels=labels, font_size=10)
+        plt.title(f"Grafo filtrado – Músculo: {musculo}")
+        plt.show()
+
 
 #          INTEGRAÇÃO DO DATAFRAME COM O GRAFO
 
@@ -222,7 +258,8 @@ for _, row in base.iterrows():
     kg.adicionar_relacionamento(
         head=row['head'],
         relation=row['relacao'],
-        tail=row['tail']
+        tail=row['tail'],
+        atualizar_base=False
     )
 
 #Menu de opções para o usuário
@@ -242,7 +279,8 @@ class Menu:
         print("7 - Listar Relacionamentos ")
         print("8 - Ver Base de conhecimento")
         print("9 - Mostrar grafo")
-        print("10 -Encerrar")
+        print("10- Consultar grafo por músculo e visualização")
+        print("11 -Encerrar")
 
     def inicio(self):
         self.menu=Menu()
@@ -271,7 +309,7 @@ class Menu:
                 self.grafo.remover_relacionamento(head,relation,tail)
 
             elif opcao==5:
-                no=input("Qual o nome que deseja consultar? ")
+                no=input("Qual o nó que deseja consultar? ")
                 self.grafo.consultar_relacionamentos_de(no)
 
             elif opcao==6:
@@ -291,6 +329,18 @@ class Menu:
                 self.grafo.mostrar_grafo()
 
             elif opcao==10:
+                musculo = input("Digite o músculo desejado: ")
+
+                resultados = self.grafo.exercicios_para_musculo(musculo)
+
+                print("\nExercícios que trabalham ou ativam esse músculo:")
+                for r in resultados:
+                    print(r)
+
+                print("\nGerando grafo...")
+                self.grafo.mostrar_grafo_musculo(musculo)
+
+            elif opcao==11:
                 print("Encerrando...")
                 break
 
