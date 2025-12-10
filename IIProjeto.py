@@ -6,39 +6,39 @@ import matplotlib.pyplot as plt
 base = pd.DataFrame({ # cria um DataFrame com colunas head, relacao, tail representando triplas (head, relação, tail)
     'head': [ #Nós iniciais da relação
         #Alunos -> Objetivo
-        'Paola', 'Lucas',
+        'Paola', 
         #Alunos -> tipo de treino
         'Paola', 'Lucas',
         #Exercícios -> Músculos trabalhados (Músculo primário)
-        'Agachamento', 'Rosca 21', 'Tríceps Testa', 'Elevação Pélvica', 'Puxada Alta', 'Leg 45°',
+        'Agachamento', 'Rosca 21', 'Tríceps Testa', 'Elevação Pélvica', 'Puxada Alta', 'Leg 45°', 'Supino reto',
         #Exerícios -> Músculos secundários
         'Agachamento', 'Rosca 21', 'Tríceps Testa','Leg 45°','Leg 45°',
         #Exercício -> Máquina
-        'Tríceps Testa','Elevação Pélvica','Leg 45°'
+        'Tríceps Testa','Leg 45°'
     ],
     'relacao': [ #Relação entre os nós 
         #Alunos -> Objetivo
-        'tem objetivo', 'tem objetivo',
+        'tem objetivo', 
         #Alunos -> tipo de treino
         'treina', 'treina',
         #Exercícios -> Músculos trabalhados (Músculo primário)
-        'trabalha','trabalha','trabalha','trabalha','trabalha','trabalha',
+        'trabalha','trabalha','trabalha','trabalha','trabalha','trabalha', 'trabalha',
         #Exerícios -> Músculos secundários
         'ativa','ativa','ativa','ativa','ativa',
         #Exercício -> Máquina
-        'usa máquina','usa máquina','usa máquina'
+        'usa máquina','usa máquina'
     ],
     'tail': [
         #Alunos -> Objetivo
-        'Emagrecimento', 'Hipertrofia',
+        'Emagrecimento', 
         #Alunos -> tipo de treino
         'Agachamento', 'Rosca 21',
         #Exercícios -> Músculos trabalhados (Músculo primário)
-        'Quadríceps','Bíceps','Tríceps','Glúteo','Costas','Quadríceps',
+        'Quadríceps','Bíceps','Tríceps','Glúteo','Costas','Quadríceps', 'Peito',
         #Exerícios -> Músculos secundários
         'Glúteo','Antebraço','Ombros','Glúteo','Posterior de coxa',
         #Exercício -> Máquina
-        'banco e halteres','Aparelho de elevação','Leg Press'
+        'banco e halteres','Leg Press'
     ]
 })
 
